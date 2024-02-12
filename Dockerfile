@@ -2,7 +2,7 @@
 FROM alpine:latest
 
 # Install a minimal LaTeX distribution.
-RUN apk update && apk add texmf-dist texlive
+RUN apk update && apk add texmf-dist texlive texlive-luatex texlive-xetex
 
 # Add texlive.profile file.
 COPY ./texlive.profile /tmp/texlive.profile
@@ -22,6 +22,14 @@ ENV INFOPATH="/usr/local/texlive/2023/texmf-dist/doc/info:${INFOPATH}"
 # Update tlmgr and install desired packages.
 RUN tlmgr update --self --all && \
     tlmgr install pdfx
+
+# Install fonts.
+RUN apk --no-cache add msttcorefonts-installer fontconfig && \
+    update-ms-fonts && \
+    fc-cache -f
+
+RUN apk --no-cache add font-carlito && \
+    fc-cache -f
 
 # Set working directory.
 WORKDIR /latex
